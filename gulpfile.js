@@ -6,6 +6,15 @@ const sourcemaps = require('gulp-sourcemaps');
 const gcmq = require('gulp-group-css-media-queries');
 const less = require('gulp-less');
 const imagemin = require('gulp-imagemin');
+const babel = require('gulp-babel');
+
+gulp.task('babel', () =>
+    gulp.src('dist/js/*.js')
+        .pipe(babel({
+            presets: ['es2015']
+        }))
+        .pipe(gulp.dest('dist/js'))
+);
 
 gulp.task('build', function(){
     gulp.src('src/less/style.less')
@@ -27,7 +36,7 @@ gulp.task('build', function(){
 });
 
 gulp.task('production', function(){
-    gulp.src(['src/**/*.*', '!**/img/**', '!**/less/**'])
+    gulp.src(['src/**/*.*', '!**/img/**','!**/js/**', '!**/less/**'])
         .pipe(gulp.dest('dist'))
     gulp.src('src/img/*.*')
         .pipe(imagemin())

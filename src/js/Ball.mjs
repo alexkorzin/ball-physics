@@ -1,27 +1,19 @@
 export default class Ball {
 
     constructor(obj) {
-        function getRandomArbitrary(min, max) {
-            return Math.random() * (max - min) + min;
-        }
-
-        // Get random radius
-        this.randomize = obj.randomize;
         this.radius = obj.radius || 10;
-        if (this.randomize) this.radius = getRandomArbitrary(10, this.radius);
-        else this.radius = obj.radius || 10;
 
         // Get random position
-        this.x = obj.x || getRandomArbitrary(2 * this.radius, window.innerWidth - 2 * this.radius);
-        this.y = obj.y || getRandomArbitrary(2 * this.radius, window.innerHeight - 2 * this.radius);
+        this.x = obj.x;
+        this.y = obj.y;
 
         this.velocity = {
-            x: obj.velocityX || 0.5,
-            y: obj.velocityX || 0.5
+            x: obj.velocityX || 0,
+            y: obj.velocityX || 0
         }
 
         this.color = obj.color || '#98ccd3';
-        this.friction = 0.95;
+        this.friction = 0.93;
         this.mass = this.radius;
     }
 
@@ -29,8 +21,9 @@ export default class Ball {
         ctx.save()
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-        ctx.fillStyle = this.color;
-        ctx.fill();
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 1;
+        ctx.stroke();
         ctx.closePath();
         ctx.restore();
     }
@@ -56,7 +49,6 @@ export default class Ball {
 
     phys(object, mouse) {
         let distance = this.getDistance(this, object);
-
         // Colision Moment
         if (distance < this.radius + object.radius) {
 
@@ -72,13 +64,12 @@ export default class Ball {
 
                 let ex = object.x + Math.cos(angle) * (object.radius + this.radius);
                 let ey = object.y - Math.sin(angle) * (object.radius + this.radius);
-                
+
                 let inX = ex - this.x;
                 let inY = ey - this.y;
-                console.log('x: ', inX, 'y:', inY)
-                this.velocity.x += ex - this.x;
-                this.velocity.y += ey - this.y;
-
+                // console.log('x: ', inX, 'y:', inY)
+                this.velocity.x += (ex - this.x) * 0.8;
+                this.velocity.y += (ey - this.y) * 0.8;
             } else {
                 // If objects are not overlaping
                 if (xVelocityDiff * xDist + yVelocityDiff * yDist >= 0) {
@@ -103,21 +94,33 @@ export default class Ball {
                     object.velocity.y = vFinal2.y;
                     this.velocity.x = vFinal1.x;
                     this.velocity.y = vFinal1.y;
+                    
+                    return true;
                 }
             }
-
-
         }
     }
 
     sideColision(screen) {
-        //Left and right side colision
-        if (this.x - this.radius <= 0 || this.x + this.radius > screen.width) {
-            this.velocity.x = -this.velocity.x;
+        //Left side colision
+        if (this.x - this.radius < 0) {
+            let ex = (this.radius);
+            this.velocity.x += (ex - this.x);
         }
-        //Top and bottom side colision
-        if (this.y - this.radius <= 0 || this.y + this.radius > screen.height) {
-            this.velocity.y = -this.velocity.y;
+        //Right side colision
+        if (this.x + this.radius > screen.width) {
+            let ex = (screen.width - this.radius);
+            this.velocity.x += (ex - this.x);
+        }
+        //Top side colision
+        if (this.y - this.radius < 0) {
+            let ey = (this.radius);
+            this.velocity.y += (ey - this.y);
+        }
+        //Bottom side colision
+        if (this.y + this.radius > screen.height) {
+            let ey = (screen.height - this.radius);
+            this.velocity.y += (ey - this.y);
         }
     }
 

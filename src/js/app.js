@@ -1,5 +1,13 @@
 import Mouse from './Mouse.mjs'
 import Ball from './Ball.mjs';
+
+// Game starts set
+let countSet = document.querySelector('.counts');
+let levelCounter = document.querySelector('.level_counter');
+let levelCurrent = document.querySelector('.level_number');
+let count = 0;
+let level = 0;
+
 // ======Canvas======
 let screen = {
     height: window.innerHeight,
@@ -7,11 +15,30 @@ let screen = {
 }
 let canvas = document.querySelector('.canvas');
 let ctx = canvas.getContext('2d');
-canvas.height = screen.height;
+canvas.height = screen.height - levelCounter.offsetHeight;
 canvas.width = screen.width;
 
-let countSet = document.querySelector('.counts');
-let count = 0;
+console.log(canvas.height)
+
+function levelChecker() {
+    if (level == 0) {
+        let percent = count/10
+        levelCounter.style.width = percent + '%';
+        if (count > 1000) {
+            level++;
+            levelCurrent.innerHTML = level;
+            levelCounter.style.width = '0%';
+        }
+    } else {
+        let percent = (count - (1000 *level) +1000) / 10
+        levelCounter.style.width = percent + '%';
+        if (count > level * 1000) {
+            level++;
+            levelCurrent.innerHTML = level;
+            levelCounter.style.width = '0%';
+        }
+    }
+}
 
 // ======Control Vars======
 let mouseBallRadius = 50;
@@ -65,7 +92,7 @@ for (let i = 0; i < 20; i++) {
         }
     }
     balls.push(new Ball({
-        color: '#364e68',
+        color: '#0d627a',
         radius: radius,
         x: newBallCoords.x,
         y: newBallCoords.y
@@ -75,17 +102,18 @@ for (let i = 0; i < 20; i++) {
 function Render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     mouseBall.updatePos(mouse.x, mouse.y);
-    mouseBall.draw(ctx)
+    mouseBall.draw(ctx, 'fill')
 
     balls.forEach((ball, ballCurrent) => {
         ballsColision(ballCurrent, ball);
         ball.phys(mouseBall, mouse);
         ball.speed();
-        ball.sideColision(screen)
+        ball.sideColision(canvas)
         ball.frict();
         // ball.reduceVxy();
-        ball.draw(ctx);
+        ball.draw(ctx, 'fill');
         countSet.innerHTML = count;
+        levelChecker();
     })
     window.requestAnimationFrame(Render);
 }

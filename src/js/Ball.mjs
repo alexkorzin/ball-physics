@@ -17,13 +17,20 @@ export default class Ball {
         this.mass = this.radius;
     }
 
-    draw(ctx) {
+    draw(ctx, colorType) {
+        let type = colorType || 'stroke';
         ctx.save()
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         ctx.strokeStyle = this.color;
+        ctx.fillStyle = this.color;
         ctx.lineWidth = 1;
-        ctx.stroke();
+        if(type == 'stroke'){
+            ctx.stroke();
+        } 
+        if(type == 'fill'){
+            ctx.fill();
+        } 
         ctx.closePath();
         ctx.restore();
     }

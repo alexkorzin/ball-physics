@@ -47,13 +47,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         _createClass(Ball, [{
             key: 'draw',
-            value: function draw(ctx) {
+            value: function draw(ctx, colorType) {
+                var type = colorType || 'stroke';
                 ctx.save();
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
                 ctx.strokeStyle = this.color;
+                ctx.fillStyle = this.color;
                 ctx.lineWidth = 1;
-                ctx.stroke();
+                if (type == 'stroke') {
+                    ctx.stroke();
+                }
+                if (type == 'fill') {
+                    ctx.fill();
+                }
                 ctx.closePath();
                 ctx.restore();
             }
@@ -183,20 +190,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return Ball;
     }();
 
+    // Game starts set
+
+
+    var countSet = document.querySelector('.counts');
+    var levelCounter = document.querySelector('.level_counter');
+    var levelCurrent = document.querySelector('.level_number');
+    var count = 0;
+    var level = 0;
+
     // ======Canvas======
-
-
     var screen = {
         height: window.innerHeight,
         width: window.innerWidth
     };
     var canvas = document.querySelector('.canvas');
     var ctx = canvas.getContext('2d');
-    canvas.height = screen.height;
+    canvas.height = screen.height - levelCounter.offsetHeight;
     canvas.width = screen.width;
 
-    var countSet = document.querySelector('.counts');
-    var count = 0;
+    console.log(canvas.height);
+
+    function levelChecker() {
+        if (level == 0) {
+            var percent = count / 10;
+            levelCounter.style.width = percent + '%';
+            if (count > 1000) {
+                level++;
+                levelCurrent.innerHTML = level;
+                levelCounter.style.width = '0%';
+            }
+        } else {
+            var _percent = (count - 1000 * level + 1000) / 10;
+            levelCounter.style.width = _percent + '%';
+            if (count > level * 1000) {
+                level++;
+                levelCurrent.innerHTML = level;
+                levelCounter.style.width = '0%';
+            }
+        }
+    }
 
     // ======Control Vars======
     var mouseBallRadius = 50;
@@ -248,7 +281,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             }
         }
         balls.push(new Ball({
-            color: '#364e68',
+            color: '#0d627a',
             radius: radius,
             x: newBallCoords.x,
             y: newBallCoords.y
@@ -258,17 +291,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     function Render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         mouseBall.updatePos(mouse.x, mouse.y);
-        mouseBall.draw(ctx);
+        mouseBall.draw(ctx, 'fill');
 
         balls.forEach(function (ball, ballCurrent) {
             ballsColision(ballCurrent, ball);
             ball.phys(mouseBall, mouse);
             ball.speed();
-            ball.sideColision(screen);
+            ball.sideColision(canvas);
             ball.frict();
             // ball.reduceVxy();
-            ball.draw(ctx);
+            ball.draw(ctx, 'fill');
             countSet.innerHTML = count;
+            levelChecker();
         });
         window.requestAnimationFrame(Render);
     }

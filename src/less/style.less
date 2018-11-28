@@ -31,3 +31,30 @@ body{
         opacity: 0.08;
     }
 }
+
+.level{
+    background: #20716a;
+    height: 50px;
+    text-align: center;
+    position: relative;
+
+    &_current{
+        font-weight: bold;
+        text-transform: uppercase;
+        color: white;
+        font-family: Arial, sans-serif;
+        line-height: 50px;
+        position: relative;
+        z-index: 2;
+    }
+
+    &_counter{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background: #23a393;
+        z-index: 1;
+    }
+}
